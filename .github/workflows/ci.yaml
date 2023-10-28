@@ -29,13 +29,17 @@ jobs:
             otp: 24.x
           - elixir: 1.14.x
             otp: 25.x
+          - elixir: 1.15.x
+            otp: 26.x
+            # prevent logger.warn/2 as error
+            no-warnings: true
     steps:
       - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install libvips build dependencies
         run: sudo apt-get install build-essential libxml2-dev libfftw3-dev libmagickwand-dev libopenexr-dev liborc-0.4-0 gobject-introspection libgsf-1-dev libglib2.0-dev liborc-0.4-dev curl
@@ -84,6 +88,9 @@ jobs:
 
       - run: mix deps.get
       - run: mix compile --force --warnings-as-errors
+        if: ${{!matrix.no-warnings}}
+      - run: mix compile --force
+        if: ${{matrix.no-warnings}}
       - run: mix test --trace
 
   linux-precompiled-libvips:
@@ -94,14 +101,14 @@ jobs:
     strategy:
       matrix:
         include:
-          - elixir: 1.14.x
-            otp: 25.x
+          - elixir: 1.15.x
+            otp: 26.x
     steps:
       - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: mix deps.get
       - run: mix test --trace
 
@@ -111,21 +118,21 @@ jobs:
     strategy:
       matrix:
         include:
-          - elixir: 1.14.x
-            otp: 25.x
+          - elixir: 1.15.x
+            otp: 26.x
     steps:
       - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: mix deps.get
       - run: mix test --trace
 
   macos-precompiled:
     runs-on: macos-11
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install erlang and elixir
         run: |
           brew install erlang elixir
@@ -140,15 +147,15 @@ jobs:
     strategy:
       matrix:
         include:
-          - elixir: 1.14.x
-            otp: 25.x
+          - elixir: 1.15.x
+            otp: 26.x
     steps:
       - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Cache Dependencies
         id: mix-cache
